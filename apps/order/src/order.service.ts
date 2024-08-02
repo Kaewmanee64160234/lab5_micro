@@ -1,91 +1,43 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class OrderService {
+  private orders = [];
   constructor(private httpService: HttpService) {}
-  createOrder(orderItems: { meneItemId: number; quantity: number }[]) {
-    throw new Error('Method not implemented.');
+
+  getOrder(id: number) {
+    const order = this.orders.find((o) => o.id === id);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    return order;
   }
-  private orders = [
-    // {
-    //   id: 1,
-    //   orderItems: [
-    //     {
-    //       meneItemId: 1,
-    //       quantity: 2,
-    //     },
-    //   ],
-    //   total: 20,
-    // },
-    // {
-    //   id: 2,
-    //   orderItems: [
-    //     {
-    //       meneItemId: 2,
-    //       quantity: 1,
-    //     },
-    //   ],
-    //   total: 15,
-    // },
-    // {
-    //   id: 3,
-    //   orderItems: [
-    //     {
-    //       meneItemId: 3,
-    //       quantity: 3,
-    //     },
-    //   ],
-    //   total: 15,
-    // },
-    // {
-    //   id: 4,
-    //   orderItems: [
-    //     {
-    //       meneItemId: 1,
-    //       quantity: 1,
-    //     },
-    //     {
-    //       meneItemId: 3,
-    //       quantity: 2,
-    //     },
-    //   ],
-    //   total: 15,
-    // },
-  ];
-  async getOrderById(arg0: number) {
+
+  async createOrder(orderItems: { menuItemId: number; quantity: number }[]) {
     const menuResponse = await firstValueFrom(
       this.httpService.get('http://localhost:3001/menu'),
     );
     const menuItems = menuResponse.data;
-
+    console.log(menuItems);
     let total = 0;
-
-    for (const menuItem of menuItems) {
-      const orderItem = this.orders.find((order) => order.id === arg0);
-      if (!orderItem) {
-        throw new Error('Order not found');
+    const orderItems2 = [];
+    for (const item of orderItems) {
+      const menuItem = menuItems.find((mi) => mi.id === item.menuItemId);
+      orderItems2.push({ ...menuItem, quantity: item.quantity });
+      if (!menuItem) {
+        throw new NotFoundException(`Menu item ${item.menuItemId} not found`);
       }
-      const item = orderItem.orderItems.find(
-        (item) => item.meneItemId === menuItem.id,
-      );
-      if (item) {
-        total += item.quantity * menuItem.price;
-      }
+      total += menuItem.price * item.quantity;
     }
-    const order = {
-      id: this.orders.length + 1,
-      items: menuItems,
-      total: total,
-    };
 
+    const order = { id: this.orders.length + 1, items: orderItems2, total };
     this.orders.push(order);
-  }
-  getAllOrder() {
-    throw new Error('Method not implemented.');
+    return order;
   }
 
+  // hello
   getHello(): string {
     return 'Hello World!';
   }
