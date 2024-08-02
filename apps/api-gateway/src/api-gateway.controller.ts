@@ -1,4 +1,4 @@
-import { Controller, Get, HttpServer } from '@nestjs/common';
+import { Controller, Get, HttpServer, Param } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -17,11 +17,10 @@ export class ApiGatewayController {
 
   // get menu by id
   @Get('menu/:id')
-  async getMenuById(id: number) {
+  async getMenuById(@Param('id') id: string) {
     const res = await firstValueFrom(
       this.httpService.get(`http://localhost:3001/menu/${id}`),
     );
-
     return res.data;
   }
 }

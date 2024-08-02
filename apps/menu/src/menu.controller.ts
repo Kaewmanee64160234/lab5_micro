@@ -1,24 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MenuService } from './menu.service';
 
-@Controller()
+@Controller('menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
-  @Get()
+  @Get('hello')
   getHello(): string {
     return this.menuService.getHello();
   }
 
   // getAll menu
-  @Get('menu')
+  @Get()
   getMenu() {
     return this.menuService.getMenu();
   }
 
   // get menu by id
-  @Get('menu/:id')
-  async getMenuById(id: number) {
-    return this.menuService.getMenuById(id);
+  @Get('/:id')
+  async getMenuById(@Param('id') id: string) {
+    return this.menuService.getMenuById(+id);
   }
 }
