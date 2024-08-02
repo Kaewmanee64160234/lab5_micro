@@ -20,4 +20,10 @@ export class OrderController {
   getHello(): string {
     return this.orderService.getHello();
   }
+
+  // getOrders
+  @Get()
+  getOrders() {
+    return this.orderService.getOrders();
+  }
 }

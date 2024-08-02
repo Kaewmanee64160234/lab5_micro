@@ -15,6 +15,11 @@ export class OrderService {
     return order;
   }
 
+  // get orders
+  getOrders() {
+    return this.orders;
+  }
+
   async createOrder(orderItems: { menuItemId: number; quantity: number }[]) {
     const menuResponse = await firstValueFrom(
       this.httpService.get('http://localhost:3001/menu'),
